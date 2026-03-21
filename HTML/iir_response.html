@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IIR Highpass Filter Response</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    padding: 24px;
+    color: #24292f;
+    background: #fff;
+    line-height: 1.6;
+  }
+  .section { margin-bottom: 24px; }
+  .section-label {
+    font-size: 13px;
+    color: #656d76;
+    margin-bottom: 8px;
+  }
+  .formula { font-size: 18px; margin-bottom: 4px; }
+  .formula-lg { font-size: 20px; margin-bottom: 4px; }
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .control-row label {
+    font-size: 14px;
+    color: #656d76;
+    min-width: 80px;
+  }
+  .control-row input[type="range"] { flex: 1; }
+  .control-row .val {
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 120px;
+  }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .metric-card {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .metric-card .label {
+    font-size: 12px;
+    color: #656d76;
+    margin-bottom: 4px;
+  }
+  .metric-card .value {
+    font-size: 18px;
+    font-weight: 500;
+    color: #24292f;
+  }
+  .chart-container {
+    position: relative;
+    height: 320px;
+    margin: 20px 0;
+  }
+  table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+  }
+  th {
+    padding: 6px 12px;
+    text-align: left;
+    color: #656d76;
+    font-weight: 400;
+    border-bottom: 1px solid #d0d7de;
+  }
+  th:not(:first-child) { text-align: right; }
+  td {
+    padding: 5px 12px;
+    border-bottom: 1px solid #eef0f2;
+  }
+  td:not(:first-child) { text-align: right; }
+  tr.fc-row { font-weight: 500; color: #cf222e; }
+  @media (max-width: 600px) {
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    body { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="section">
+  <p class="section-label">Z 域传递函数</p>
+  <div class="formula-lg" id="eq1"></div>
+</div>
+
+<div class="section">
+  <p class="section-label">频率响应 (z = e^jw)</p>
+  <div class="formula" id="eq2"></div>
+</div>
+
+<div class="section">
+  <p class="section-label">幅度响应</p>
+  <div class="formula" id="eq3"></div>
+</div>
+
+<div class="section">
+  <p class="section-label">衰减量 (dB)</p>
+  <div class="formula" id="eq4"></div>
+</div>
+
+<div class="section">
+  <p class="section-label">截止频率</p>
+  <div class="formula" id="eq5"></div>
+</div>
+
+<div class="section">
+  <p class="section-label">调节参数，观察响应变化</p>
+  <div class="control-row">
+    <label>a0 寄存器值</label>
+    <input type="range" min="8192" max="32000" value="23807" step="1" id="a0slider">
+    <span class="val" id="a0val">23807 (0.727)</span>
+  </div>
+  <div class="control-row">
+    <label>采样率 fs</label>
+    <input type="range" min="10" max="100" value="40" step="1" id="fsslider">
+    <span class="val" id="fsval">40 MHz</span>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">截止频率 fc (-3dB)</div>
+      <div class="value" id="fc_val">2.39 MHz</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">滚降斜率</div>
+      <div class="value">-20 dB/dec</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">0.5 MHz 衰减</div>
+      <div class="value" id="atten_05">-14.2 dB</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">DC 衰减</div>
+      <div class="value">-inf dB</div>
+    </div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <canvas id="magchart"></canvas>
+</div>
+
+<div class="section">
+  <p class="section-label">典型频率点衰减量</p>
+  <table id="freq_table"></table>
+</div>
+
+<script>
+var kopts = {displayMode: true, throwOnError: false};
+katex.render("H(z) = a_0 \\cdot \\frac{1 - z^{-1}}{1 - a_0 \\cdot z^{-1}}", document.getElementById("eq1"), kopts);
+katex.render("H(e^{j\\omega}) = a_0 \\cdot \\frac{1 - e^{-j\\omega}}{1 - a_0 \\cdot e^{-j\\omega}}", document.getElementById("eq2"), kopts);
+katex.render("|H(e^{j\\omega})| = a_0 \\cdot \\frac{\\sqrt{2 - 2\\cos\\omega}}{\\sqrt{1 + a_0^2 - 2a_0\\cos\\omega}}", document.getElementById("eq3"), kopts);
+katex.render("A(f) = 20 \\cdot \\log_{10}|H(e^{j 2\\pi f / f_s})|\\;\\;\\text{dB}", document.getElementById("eq4"), kopts);
+katex.render("f_c = \\frac{f_s \\cdot (1 - a_0)}{2\\pi \\cdot a_0}", document.getElementById("eq5"), kopts);
+
+function calcMag(a0, f, fs) {
+    var w = 2 * Math.PI * f / fs;
+    var num = Math.sqrt(2 - 2 * Math.cos(w));
+    var den = Math.sqrt(1 + a0 * a0 - 2 * a0 * Math.cos(w));
+    if (den < 1e-12) return 0;
+    return a0 * num / den;
+}
+function calcDb(mag) {
+    if (mag < 1e-12) return -80;
+    return 20 * Math.log10(mag);
+}
+
+var ctx = document.getElementById("magchart").getContext("2d");
+var chart = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [{
+            label: "幅度响应 (dB)",
+            data: [],
+            borderColor: "#2f81f7",
+            backgroundColor: "rgba(47,129,247,0.06)",
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.3
+        },{
+            label: "-3 dB 截止线",
+            data: [],
+            borderColor: "#cf222e",
+            borderWidth: 1,
+            borderDash: [6,4],
+            pointRadius: 0,
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: {display: true, text: "频率 (MHz)", font: {size: 13}},
+                ticks: {font: {size: 11}, maxTicksLimit: 12}
+            },
+            y: {
+                title: {display: true, text: "幅度 (dB)", font: {size: 13}},
+                ticks: {font: {size: 11}},
+                min: -40,
+                max: 3
+            }
+        },
+        plugins: {
+            legend: {display: true, position: "top", labels: {font: {size: 12}, boxWidth: 20}},
+            tooltip: {
+                callbacks: {
+                    label: function(c) {
+                        return c.dataset.label + ": " + c.parsed.y.toFixed(1) + " dB";
+                    }
+                }
+            }
+        }
+    }
+});
+
+function updateAll() {
+    var a0reg = parseInt(document.getElementById("a0slider").value);
+    var fs = parseInt(document.getElementById("fsslider").value) * 1e6;
+    var a0 = a0reg / 32768;
+    document.getElementById("a0val").textContent = a0reg + " (" + a0.toFixed(3) + ")";
+    document.getElementById("fsval").textContent = Math.round(fs / 1e6) + " MHz";
+    var fc = fs * (1 - a0) / (2 * Math.PI * a0);
+    document.getElementById("fc_val").textContent = (fc / 1e6).toFixed(2) + " MHz";
+    document.getElementById("atten_05").textContent = calcDb(calcMag(a0, 0.5e6, fs)).toFixed(1) + " dB";
+
+    var labels = [], data = [], refline = [];
+    var fmax = fs / 2, npts = 500;
+    for (var i = 1; i <= npts; i++) {
+        var f = (i / npts) * fmax;
+        labels.push((f / 1e6).toFixed(1));
+        data.push(Math.round(calcDb(calcMag(a0, f, fs)) * 100) / 100);
+        refline.push(-3);
+    }
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
+    chart.data.datasets[1].data = refline;
+    chart.update("none");
+
+    var freqs = [0.1, 0.5, 1, 2, parseFloat((fc / 1e6).toFixed(2)), 5, 10, 15];
+    var seen = {};
+    var html = "<tr><th>频率 (MHz)</th><th>|H(f)|</th><th>dB</th></tr>";
+    for (var j = 0; j < freqs.length; j++) {
+        var ff = freqs[j] * 1e6;
+        if (ff >= fs / 2) continue;
+        var key = freqs[j].toFixed(2);
+        if (seen[key]) continue;
+        seen[key] = true;
+        var mg = calcMag(a0, ff, fs);
+        var ddb = calcDb(mg);
+        var isfc = Math.abs(freqs[j] - fc / 1e6) < 0.05;
+        var cls = isfc ? ' class="fc-row"' : '';
+        html += "<tr" + cls + "><td>" + (isfc ? freqs[j].toFixed(2) + " (fc)" : freqs[j].toFixed(1)) + "</td>";
+        html += "<td>" + mg.toFixed(4) + "</td>";
+        html += "<td>" + ddb.toFixed(1) + "</td></tr>";
+    }
+    document.getElementById("freq_table").innerHTML = html;
+}
+
+document.getElementById("a0slider").addEventListener("input", updateAll);
+document.getElementById("fsslider").addEventListener("input", updateAll);
+updateAll();
+</script>
+
+</body>
+</html>
