@@ -1,0 +1,497 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>FPGA-一个大神的博客 | JERRY'S BLOG</title><meta name="author" content="JERRY LEE,98jerry.lee@gmail.com"><meta name="copyright" content="JERRY LEE"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="FPGA-一个大神的博客简介FPGA 工具最大的挑战是满足时序约束的要求。希望这能奏效，但有时会失败。当它失败时，我们人类有责任找出失败的原因并加以修正。这个任务有个名字：我们称之为时序闭合 。这可不是一件容易的事。 为什么时序闭合难？问题是，这些工具有一个布局和路由算法，试图以最优的方式利用 FPGA 的资源。通常，这个算法从将逻辑元素放置在 FPGA 上开始，且不费吹灰之力。然后开始一个迭代过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FPGA-一个大神的博客">
+<meta property="og:url" content="http://example.com/2026/04/18/FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:site_name" content="JERRY&#39;S BLOG">
+<meta property="og:description" content="FPGA-一个大神的博客简介FPGA 工具最大的挑战是满足时序约束的要求。希望这能奏效，但有时会失败。当它失败时，我们人类有责任找出失败的原因并加以修正。这个任务有个名字：我们称之为时序闭合 。这可不是一件容易的事。 为什么时序闭合难？问题是，这些工具有一个布局和路由算法，试图以最优的方式利用 FPGA 的资源。通常，这个算法从将逻辑元素放置在 FPGA 上开始，且不费吹灰之力。然后开始一个迭代过">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/my_logo.png">
+<meta property="article:published_time" content="2026-04-18T04:08:21.009Z">
+<meta property="article:modified_time" content="2026-04-18T04:09:58.089Z">
+<meta property="article:author" content="JERRY LEE">
+<meta property="article:tag" content="FPGA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/my_logo.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/04/18/FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.14.0-b2"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'FPGA-一个大神的博客',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-04-18 12:09:58'
+}</script><base href="/" /><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" /><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/my_logo.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">42</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="JERRY'S BLOG"><img class="site-icon" src="/img/my_logo.png" alt="Logo"/><span class="site-name">JERRY'S BLOG</span></a></span><div id="menus"><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">FPGA-一个大神的博客</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-18T04:08:21.009Z" title="发表于 2026-04-18 12:08:21">2026-04-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-18T04:09:58.089Z" title="更新于 2026-04-18 12:09:58">2026-04-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/FPGA/">FPGA</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="FPGA-一个大神的博客"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="FPGA-一个大神的博客"><a href="#FPGA-一个大神的博客" class="headerlink" title="FPGA-一个大神的博客"></a>FPGA-一个大神的博客</h1><p>简介<br>FPGA 工具最大的挑战是满足时序约束的要求。希望这能奏效，但有时会失败。当它失败时，我们人类有责任找出失败的原因并加以修正。这个任务有个名字：我们称之为时序闭合 。这可不是一件容易的事。</p>
+<p>为什么时序闭合难？问题是，这些工具有一个布局和路由算法，试图以最优的方式利用 FPGA 的资源。通常，这个算法从将逻辑元素放置在 FPGA 上开始，且不费吹灰之力。然后开始一个迭代过程：工具会遍历所有路径，找出那些无法满足时序约束的路径。为了纠正这些失误，会在这些路径上采取纠正措施。最显著的是，逻辑元件被移动到 FPGA 的不同位置，并调整了布线。至于更高级的纠正措施，每个 FPGA 工具都有自己的方法。</p>
+<p>当所有路径都满足时序约束时，实现即告完成。但实施也可能因为工具未能达到这一目标而终止，从而放弃了尝试。在这种情况下，我们能理解工具在努力停止时所取得的成果。这种结果不一定是最优的：实现过程中可能存在可以改进的路径，但工具们忙于修复其他问题。当这些方法失败时，工具们放弃了，没有尝试修复其他问题。就像工具在说：“如果实现迟早会失败，修复它也没意义。”</p>
+<p>作为 FPGA 设计师，我们的任务是审视这种次优结果，找出时序约束目标未能实现的原因。</p>
+<p>算法会随着时间变得更好。当有共同原因导致无法满足时序约束时，下一版本的软件会针对该情况提供具体解决方案。所以当工具失效时，通常都有充分的原因。</p>
+<p>所以我们会看看这些工具取得了什么成就，然后问自己：为什么这些工具会失败？我们是不是提出了不可能的要求？更重要的是，我们是不是提出了不必要的要求？也许导致工具失效的障碍其实是我们根本不需要的东西。或者，优化算法的效果不够好？有时这只是运气不好：逻辑元素的初始配置可能糟糕到以至于后续提升性能的尝试注定失败。</p>
+<p>无论问题是什么，找到失败原因就像侦探调查犯罪现场一样：事实摆在眼前，但原因往往被隐藏。这些事实大多可以在时间报告中找到，但线索并不容易暴露。必须始终问的问题是，计时报告中出了什么问题、异常或异常。就像试图找到罪犯的侦探一样，目标是找到导致问题的细节。</p>
+<p>但要找出异常，你必须知道什么是正常：例如，对于具有特定扇形展开的网来说，正常延迟是多少？实现某个逻辑函数时，正常的逻辑电平是多少？这类问题的答案因 FPGA 而异。因此，即使一切正常，也必须通过阅读和理解计时报告来积累经验。你必须能知道当一切正常时，计时报告是什么样子，才能找到时序报告中指出问题的地方。如果你想知道为什么我之前几页要讲细节，这也是原因之一。</p>
+<p>关键路径<br>当工具未能满足时序约束时，意味着至少有一条路径存在负松弛。负松弛路径称为临界路径。这个名称反映了通常的时序闭合策略：专注于临界路径通常是解决时序问题的有效方法。但我将在下面说明，这种策略有时也可能浪费时间。</p>
+<p>当时间约束满足时，临界路径即为松弛最小的路径。这条路径通常不有趣，因为工具不会尝试以积极的松弛来改善路径。所以如果最差的路径有正的松弛，这条路径可能是最差的巧合。</p>
+<p>但如果松弛为正且接近零（比如小于 0.2 纳秒），这可能表明该路径难以达到时序约束。这类关键路径可以被视为警告，这些路径未来可能引发麻烦（尤其是当 FPGA 逻辑变得更多，工具的精力被转移到其他路径时）。</p>
+<p>时序报告通常包含每个时钟有限数量的关键路径。大多数 FPGA 工具的默认做法是显示少数关键路径，即使其松弛为正（即时序约束达成的时间）。这是推荐的设置。</p>
+<p>关键路径的示例<br>我将从一个关键路径分析的例子开始。在这个例子中，Verilog 代码如下：</p>
+<p>   reg [24:0] calc, result;<br>   reg [11:0] x, y, z;</p>
+<p>   always @(posedge clk)<br>     begin<br>	calc &lt;&#x3D; x * y + z;<br>	result &lt;&#x3D; calc;<br>     end<br>在这个例子中，@clk 的频率是 250 MHz，并且没有使用 PLL 来生成这个时钟。还假设 @x、@y 和 @z 是与 @clk 同步的寄存器。Verilog 编码中未显示给这些寄存器值的代码，因为它无关紧要。</p>
+<p>在尝试在 Vivado 上进行该代码时，时间限制未能实现。在时间报告中，这是关键路径：</p>
+<p>Slack (VIOLATED) :        -0.239ns  (required time - arrival time)<br>  Source:                 x_reg[1]__0_replica_2&#x2F;C<br>                            (rising edge-triggered cell FDRE clocked by clk  {<a href="mailto:&#114;&#x69;&#115;&#101;&#x40;&#x30;&#46;&#x30;&#x30;&#48;&#x6e;&#x73;">rise@0.000ns</a> <a href="mailto:&#x66;&#x61;&#x6c;&#x6c;&#x40;&#50;&#x2e;&#x30;&#x30;&#48;&#x6e;&#115;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Destination:            calc_reg[23]&#x2F;D<br>                            (rising edge-triggered cell FDRE clocked by clk  {<a href="mailto:&#x72;&#x69;&#x73;&#101;&#x40;&#48;&#46;&#48;&#x30;&#48;&#110;&#115;">rise@0.000ns</a> <a href="mailto:&#102;&#x61;&#108;&#x6c;&#64;&#x32;&#x2e;&#48;&#x30;&#48;&#110;&#115;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Path Group:             clk<br>  Path Type:              Setup (Max at Slow Process Corner)<br>  Requirement:            4.000ns  (clk <a href="mailto:&#114;&#105;&#x73;&#x65;&#64;&#52;&#46;&#48;&#x30;&#48;&#110;&#115;">rise@4.000ns</a> - clk <a href="mailto:&#x72;&#x69;&#x73;&#x65;&#x40;&#x30;&#x2e;&#48;&#x30;&#48;&#x6e;&#115;">rise@0.000ns</a>)<br>  Data Path Delay:        4.180ns  (logic 1.642ns (39.282%)  route 2.538ns (60.718%))<br>  Logic Levels:           7  (CARRY8&#x3D;4 LUT3&#x3D;1 LUT4&#x3D;1 LUT6&#x3D;1)<br>  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)<br>    Destination Clock Delay (DCD):    3.176ns &#x3D; ( 7.176 - 4.000 )<br>    Source Clock Delay      (SCD):    3.864ns<br>    Clock Pessimism Removal (CPR):    0.601ns<br>  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1&#x2F;2 + DJ) &#x2F; 2 + PE<br>    Total System Jitter     (TSJ):    0.071ns<br>    Total Input Jitter      (TIJ):    0.000ns<br>    Discrete Jitter          (DJ):    0.000ns<br>    Phase Error              (PE):    0.000ns<br>  Clock Net Delay (Source):      2.032ns (routing 0.396ns, distribution 1.636ns)<br>  Clock Net Delay (Destination): 1.748ns (routing 0.365ns, distribution 1.383ns)</p>
+<pre><code>Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        0.000     0.000 r  
+AG12                                              0.000     0.000 r  clk (IN)
+                     net (fo=0)                   0.000     0.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.738     0.738 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.105     0.843    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.049     0.892 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.839     1.731    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.101     1.832 r  clk_IBUF_BUFG_inst/O
+X2Y0 (CLOCK_ROOT)    net (fo=106, routed)         2.032     3.864    clk_IBUF_BUFG
+SLICE_X54Y54         FDRE                                         r  x_reg[1]__0_replica_2/C
+</code></pre>
+<hr>
+<pre><code>SLICE_X54Y54         FDRE (Prop_HFF2_SLICEL_C_Q)
+                                                  0.137     4.001 r  x_reg[1]__0_replica_2/Q
+                     net (fo=21, routed)          0.371     4.372    x[1]_repN_2
+SLICE_X56Y53         LUT6 (Prop_E6LUT_SLICEL_I1_O)
+                                                  0.219     4.591 r  calc[23]_i_101/O
+                     net (fo=2, routed)           0.550     5.141    calc[23]_i_101_n_0
+SLICE_X54Y57         CARRY8 (Prop_CARRY8_SLICEL_DI[5]_CO[7])
+                                                  0.228     5.369 r  calc_reg[23]_i_30/CO[7]
+                     net (fo=1, routed)           0.030     5.399    calc_reg[23]_i_30_n_0
+SLICE_X54Y58         CARRY8 (Prop_CARRY8_SLICEL_CI_O[1])
+                                                  0.163     5.562 r  calc_reg[23]_i_22/O[1]
+                     net (fo=3, routed)           0.351     5.913    calc_reg[23]_i_22_n_14
+SLICE_X56Y57         LUT3 (Prop_C6LUT_SLICEL_I1_O)
+                                                  0.146     6.059 r  calc[23]_i_26/O
+                     net (fo=3, routed)           0.240     6.299    calc[23]_i_26_n_0
+SLICE_X55Y58         LUT4 (Prop_A6LUT_SLICEM_I0_O)
+                                                  0.089     6.388 r  calc[23]_i_7/O
+                     net (fo=1, routed)           0.407     6.795    calc[23]_i_7_n_0
+SLICE_X53Y57         CARRY8 (Prop_CARRY8_SLICEM_DI[2]_O[4])
+                                                  0.308     7.103 r  calc_reg[23]_i_2/O[4]
+                     net (fo=1, routed)           0.538     7.641    P[20]
+SLICE_X54Y56         CARRY8 (Prop_CARRY8_SLICEL_S[4]_O[7])
+                                                  0.352     7.993 r  calc_reg[23]_i_1/O[7]
+                     net (fo=1, routed)           0.051     8.044    P0_out[23]
+SLICE_X54Y56         FDRE                                         r  calc_reg[23]/D
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        4.000     4.000 r  
+AG12                                              0.000     4.000 r  clk (IN)
+                     net (fo=0)                   0.000     4.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.515     4.515 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.066     4.581    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.034     4.615 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.722     5.337    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.091     5.428 r  clk_IBUF_BUFG_inst/O
+X2Y0 (CLOCK_ROOT)    net (fo=106, routed)         1.748     7.176    clk_IBUF_BUFG
+SLICE_X54Y56         FDRE                                         r  calc_reg[23]/C
+                     clock pessimism              0.601     7.777    
+                     clock uncertainty           -0.035     7.741    
+SLICE_X54Y56         FDRE (Setup_HFF_SLICEL_C_D)
+                                                  0.063     7.804    calc_reg[23]
+</code></pre>
+<hr>
+<pre><code>                     required time                          7.804    
+                     arrival time                          -8.044    
+</code></pre>
+<hr>
+<pre><code>                     slack                                 -0.239
+</code></pre>
+<p>该路径的松弛为-0.239 纳秒，因此略微未满足时序约束。首先要检查的是这条路径的起点和终点：我们查看报告标题中的“源”和“目的地”，找到 x_reg 和 calc_reg。所以问题的根源显然是这部分：</p>
+<p>calc &lt;&#x3D; x * y + z;<br>这并不令人意外，因为这是 Verilog 代码中唯一有意义的操作。在现实中，问题的逻辑部分并不那么明显。</p>
+<p>从时间报告中还可以看出，存在大量逻辑层级：7. 组合路径过长。换句话说，@clk 的两个时钟边之间有太多工作要做。</p>
+<p>但失败的真正原因是什么？也许是因为路由导致了 61%的延误？回想一下，有个经验法则是路由延迟通常是总延迟的 40%。所以也许可以尝试用 FPGA 工具来提升性能？然而，这不太可能成为成功的解决方案，因为工具通常在放弃实现路径时序约束的尝试之前会努力工作。</p>
+<p>试图在@x 和@calc 之间改变逻辑函数同样徒劳：乘法是必不可少的，所以没法用更简单的方法代替。</p>
+<p>我将在下一页介绍其他可能的解决此类问题的方法。但在这种情况下，单纯列出各种技巧并无济于事。这个简单的例子说明，有时我们需要像侦探一样思考。</p>
+<p>没有什么能替代你的大脑<br>阅读计时报告时，首先要问的问题是它有什么异常。在这个例子中，答案是组合路径仅由切片组成：几乎所有 FPGA 都有指定的算术单元（DSP、算术逻辑单元，名称各异），用于请求乘法时使用。事实上，乘法和加法是此类指定逻辑中最常见的函数。所以在大多数情况下，最简单的解决方案是让工具使用指定的算术单元。该解的时间报告显示在本页底部。</p>
+<p>但我们真正应该问的问题是，为什么要用切片而不是指定的算术单位。最常见的原因是 FPGA 所有可用的算术单元已被设计的其他部分使用。在这种情况下，必要的更改可能根本与临界路径无关：也许需要通过从设计中移除部分逻辑来释放一些算术单位。另一种可能是指示工具在设计的不同部分之间以不同的方式分配这些算术单元。</p>
+<p>在这个例子中，使用切片代替算术单位，因为我希望这样：我故意关闭了算术单位的使用（用 Vivado 的合成器参数之一：我把 max_dsp 设为零）。但这并不意味着这个例子是人为的。有时 FPGA 工具使用了错误的参数，导致了这种情况。事实上，有时故意不使用算术单元是正确的，因为它们在设计的其他部分更为重要。</p>
+<p>所以最简单的解决办法就是使用指定的算术单位。但如果我们必须用切片呢？同样，解决方案是间接的。回想一下，问题所在是：</p>
+<p>calc &lt;&#x3D; x * y + z;<br>但请注意，这句话紧接着出现：</p>
+<p>result &lt;&#x3D; calc;<br>如果@calc 只在这一行中使用，其他地方不使用，则可以将计算拆分为两阶段。这种技术通常被称为管道化。所以 Verilog 代码会变成这样：</p>
+<p>   reg [24:0] calc, result;<br>   reg [11:0] x, y, z, z_d;</p>
+<p>   always @(posedge clk)<br>     begin<br>	z_d &lt;&#x3D; z;</p>
+<pre><code>calc &lt;= x * y;
+result &lt;= calc + z_d;
+ end
+</code></pre>
+<p>在此解中，@calc 仅得到乘法的结果。@z 的价值仅在下一阶段加到@calc 上。更准确地说，加号运算位于@calc 和@z_d 之间，因为该运算发生在一个时钟周期之后。所以@result 的价值和以前完全一样。</p>
+<p>通过这种方式解决这个问题很容易，因为@result 只是原始 Verilog 代码中@calc 的延迟复制。现实生活中，我们通常没这么幸运。</p>
+<p>注意关键路径只涉及@calc 和@x。@z 在路径中甚至没有提及。所以这种操作的目的是减轻算术操作的负担。更准确地说，是为了减少逻辑层级的数量。</p>
+<p>回忆一下，关键路径是优化算法执行后最差的路径。该算法不询问问题的原因。相反，它试图改善那些有负松弛的路径。所以，尽管问题的解决方案需要对@z 进行操作，但与@z 相关的路径并不是关键路径。这只是巧合，但这种情况经常发生。</p>
+<p>该解的临界路径计时报告也显示在本页底部。它显示逻辑层级数量从7级减少到6级。因此，数据路径延迟减少了0.715纳秒，这已足够满足时序限制。</p>
+<p>从这个例子中可以学到的教训是，关键路径并不总是问题的直接原因。问为什么这条路失败是正确的，但解决方案可能在别处。请记住，每个 FPGA 工具都有自己的工具，可以提供信息，帮助查找问题根源。值得花时间去了解这些工具并阅读它们的文档。</p>
+<p>应尽早避免问题，而不是以后解决<br>如果逻辑设计从一开始就正确完成，许多关于时序收敛的工作可以避免。这需要持续意识到逻辑设计不是软件。Verilog 代码的目的不是在仿真过程中产生正确的结果。真正重要的是合成器从 Verilog 代码生成的输出。</p>
+<p>一个好的逻辑设计始于思考逻辑应如何最好地实现其目的。这包括识别与时间安排相关的潜在障碍。</p>
+<p>经验较少的 FPGA 设计师通常通过反复试验来开发 Verilog 代码。模拟用于验证逻辑是否如预期工作，并逐步进行修正，直到模拟输出正确。结果可能是硬件无法使用的逻辑：为了实现时序约束，Verilog 代码必须完全重写。</p>
+<p>提前思考 Verilog 代码生成的组合路径非常重要。其理念是观察每个寄存器，并沿着组合路径直到终点。回想组合路径总是从寄存器开始，终止于寄存器。</p>
+<p>让我们来看这个例子：</p>
+<p>reg [15:0] a, b;<br>wire [16:0] x, y;<br>reg [33:0] z;</p>
+<p>assign x &#x3D; a + 2;<br>assign y &#x3D; b + 3;</p>
+<p>always @(posedge clk)<br>  z &lt;&#x3D; x * y;<br>关于@a：当该寄存器发生变化时，组合路径作为第一阶段达到@x。但@x 不是登记器。@x 通过连续赋值进行更新。因此，这条路继续向前@z。因此，逻辑在这条组合路径上执行了两个重要的运算：一个算术加法和一个算术乘法。这会不会太过分了？是否需要通过流水线技术将它分成两个时钟周期？这取决于时钟频率和使用的 FPGA。</p>
+<p>另一个重要因素是缩短组合路径的难度。有时，漫长的组合路径是不可避免的。但当路径的时序变得容易时，即使设计中有更差的路径也要改进：如果设计中有几个有问题的路径，工具通常可以通过集中精力来实现时间限制。当你能轻松满足其他路径的时间要求时，这会非常有帮助。</p>
+<p>因此，为了获得满足时序约束的设计，没有规则限制允许或禁止什么。在该领域做出正确决策需要具备 FPGA 设计经验。使用具体 FPGA 工具的经验也很重要。唯一永远正确的规则是：当可以通过简单修改 Verilog 代码来提升时序时，就去做。别偷懒，从头就做出改变。时刻要注意时间安排。</p>
+<p>快速编写逻辑<br>如前所述，目标是实现寄存器之间的短组合路径：计算下一个寄存器值的逻辑函数应当简单。换句话说，实现这些逻辑功能应需要少量的逻辑层级。</p>
+<p>作为 FPGA 设计师，我们的任务是审视 Verilog 代码，评估其逻辑函数的复杂性。这需要了解合成器如何将 Verilog 转换为逻辑元素（LUT 及其他逻辑原语）。这些知识是通过分析时间报告获得的部分经验。更难的是，这种转换在不同 FPGA 之间是不同的。所以写出能实现快速逻辑的 Verilog 代码并不容易。</p>
+<p>如果你是 FPGA 新手，建议花时间查看实现结果以便学习。计时报告展示了逻辑设计如何拆解为简单逻辑元素的示例。FPGA 工具还提供其他工具，用于查看低层逻辑元素。</p>
+<hr>
+<blockquote>
+<p>此外，还有一些简单的规则可以帮助你：</p>
+</blockquote>
+<p><strong>流水线：对寄存器要慷慨。如果可能，将逻辑任务拆分成小部分，并在每步后插入寄存器。FPGA 有很多触发器（通常每个 LUT 旁边有一个触发器），因此这种寄存器的插入不会增加 FPGA 的利用率。避免流水线的唯一原因是它会让设计变得过于复杂。</strong><br>当使用 if-then-else 时，避免串联过多的“else”从句。如果可以用“案例”陈述代替，通常会更好。“else”子句通常需要一个逻辑函数，确保该子句之前的所有内容都是假的。因此，多个“else”子句可能需要多个逻辑层次。<br>避免不必要的重置。特别是，同步复位会为逻辑函数增加一定的复杂性。这两种重置都增加了路由的难度，因为这些信号必须覆盖多个逻辑元件。关于这个话题，还有一系列单独的页面 。<br>不要创建庞大的状态机。没有硬性限制允许多少州。但如果状态数超过20个，你应该考虑重构设计。另外，确保合成器对大型状态机使用单热编码（默认情况下，大多数合成器都是这样）。这有助于快速生成逻辑。<br>内存后面加一个寄存器通常更好。让我们来看这个隐式创建的 RAM 示例：<br>reg [7:0] array[0:127];<br>reg [7:0] val;<br>reg [6:0] addr;</p>
+<p>always @(posedge clk)<br>  val &lt;&#x3D; array[addr];<br>这个 Verilog 代码是正确的，但请注意@val 是 RAM 的同步输出。因此，当出现上升时钟沿时，RAM 的操作开始，只有当数组的值获得后，@val 才会更新。因此@val 的时钟到输出的延迟相对较大（相比触发器）。因此，从@val 开始的路径存在固有的劣势。这可以通过增加一个寄存器来解决：</p>
+<p>reg [7:0] array[0:127];<br>reg [7:0] val_d, mem_out;<br>reg [6:0] addr;</p>
+<p>always @(posedge clk)<br>  begin<br>    mem_out &lt;&#x3D; array[addr];<br>    val_d &lt;&#x3D; mem_out;<br>  end<br>注意，这在功能上并不等价：@mem_out 是这里 RAM 的输出。只有一个时钟后，这个输出才被复制到@val_d，所以它并不是@val 的完全替代。但@val_d 是一个真实的寄存器，时钟到输出的延迟很低。在许多 FPGA 中，这个额外的寄存器是块 RAM 的一部分，因此触发器是不浪费的。我提过千万别担心浪费人字拖吗？</p>
+<p>不幸的是，添加这样的寄存器往往会大大复杂化设计。在这种情况下，最好不要添加这个额外的寄存器，而是尽量保持组合路径@val 短。<br>两份额外的计时报告<br>我承诺会在上面题为“你的大脑无可替代”的部分提供两份计时报告。我把它们放在这里，而不是在提到它们的地方，因为它们很长，也不太相关。</p>
+<p>注意，这两份时序报告都是相关场景的关键路径。因此，路径的起点和终点与上述路径不同。</p>
+<p>第一个时序报告涉及第一个 Verilog 代码示例。与上述计时报告不同，工具被允许使用指定的算术单位。结果是时间限制很容易实现。</p>
+<p>本时序报告是为 Kintex Ultrascale FPGA 生成的。在这一家族 FPGA 中，指定的算术单元称为 DSP48E2。注意路径起点和终点在同一 DSP48E2 单元。因此逻辑延迟是 100%。</p>
+<p>Slack (MET) :             1.406ns  (required time - arrival time)<br>  Source:                 calc_reg&#x2F;DSP_A_B_DATA_INST&#x2F;CLK<br>                            (rising edge-triggered cell DSP_A_B_DATA clocked by clk  {<a href="mailto:&#x72;&#x69;&#x73;&#101;&#64;&#x30;&#46;&#48;&#x30;&#x30;&#110;&#x73;">rise@0.000ns</a> <a href="mailto:&#102;&#x61;&#x6c;&#x6c;&#64;&#50;&#46;&#x30;&#x30;&#48;&#x6e;&#x73;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Destination:            calc_reg&#x2F;DSP_OUTPUT_INST&#x2F;ALU_OUT[10]<br>                            (rising edge-triggered cell DSP_OUTPUT clocked by clk  {<a href="mailto:&#114;&#105;&#x73;&#x65;&#x40;&#x30;&#x2e;&#x30;&#x30;&#48;&#x6e;&#115;">rise@0.000ns</a> <a href="mailto:&#x66;&#97;&#x6c;&#x6c;&#64;&#50;&#46;&#x30;&#x30;&#48;&#110;&#115;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Path Group:             clk<br>  Path Type:              Setup (Max at Slow Process Corner)<br>  Requirement:            4.000ns  (clk <a href="mailto:&#x72;&#105;&#x73;&#101;&#64;&#52;&#x2e;&#x30;&#x30;&#x30;&#110;&#x73;">rise@4.000ns</a> - clk <a href="mailto:&#x72;&#105;&#115;&#101;&#64;&#48;&#46;&#x30;&#x30;&#48;&#x6e;&#115;">rise@0.000ns</a>)<br>  Data Path Delay:        2.445ns  (logic 2.445ns (100.000%)  route 0.000ns (0.000%))<br>  Logic Levels:           4  (DSP_ALU&#x3D;1 DSP_M_DATA&#x3D;1 DSP_MULTIPLIER&#x3D;1 DSP_PREADD_DATA&#x3D;1)<br>  Clock Path Skew:        -0.010ns (DCD - SCD + CPR)<br>    Destination Clock Delay (DCD):    3.392ns &#x3D; ( 7.392 - 4.000 )<br>    Source Clock Delay      (SCD):    4.096ns<br>    Clock Pessimism Removal (CPR):    0.694ns<br>  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1&#x2F;2 + DJ) &#x2F; 2 + PE<br>    Total System Jitter     (TSJ):    0.071ns<br>    Total Input Jitter      (TIJ):    0.000ns<br>    Discrete Jitter          (DJ):    0.000ns<br>    Phase Error              (PE):    0.000ns<br>  Clock Net Delay (Source):      2.264ns (routing 0.756ns, distribution 1.508ns)<br>  Clock Net Delay (Destination): 1.964ns (routing 0.696ns, distribution 1.268ns)</p>
+<pre><code>Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        0.000     0.000 r  
+AG12                                              0.000     0.000 r  clk (IN)
+                     net (fo=0)                   0.000     0.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.738     0.738 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.105     0.843    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.049     0.892 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.839     1.731    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.101     1.832 r  clk_IBUF_BUFG_inst/O
+X2Y1 (CLOCK_ROOT)    net (fo=80, routed)          2.264     4.096    calc_reg/CLK
+DSP48E2_X11Y34       DSP_A_B_DATA                                 r  calc_reg/DSP_A_B_DATA_INST/CLK
+</code></pre>
+<hr>
+<pre><code>DSP48E2_X11Y34       DSP_A_B_DATA (Prop_DSP_A_B_DATA_DSP48E2_CLK_A2_DATA[9])
+                                                  0.302     4.398 r  calc_reg/DSP_A_B_DATA_INST/A2_DATA[9]
+                     net (fo=1, routed)           0.000     4.398    calc_reg/DSP_A_B_DATA.A2_DATA&lt;9&gt;
+DSP48E2_X11Y34       DSP_PREADD_DATA (Prop_DSP_PREADD_DATA_DSP48E2_A2_DATA[9]_A2A1[9])
+                                                  0.182     4.580 r  calc_reg/DSP_PREADD_DATA_INST/A2A1[9]
+                     net (fo=1, routed)           0.000     4.580    calc_reg/DSP_PREADD_DATA.A2A1&lt;9&gt;
+DSP48E2_X11Y34       DSP_MULTIPLIER (Prop_DSP_MULTIPLIER_DSP48E2_A2A1[9]_U[10])
+                                                  0.994     5.574 f  calc_reg/DSP_MULTIPLIER_INST/U[10]
+                     net (fo=1, routed)           0.000     5.574    calc_reg/DSP_MULTIPLIER.U&lt;10&gt;
+DSP48E2_X11Y34       DSP_M_DATA (Prop_DSP_M_DATA_DSP48E2_U[10]_U_DATA[10])
+                                                  0.164     5.738 r  calc_reg/DSP_M_DATA_INST/U_DATA[10]
+                     net (fo=1, routed)           0.000     5.738    calc_reg/DSP_M_DATA.U_DATA&lt;10&gt;
+DSP48E2_X11Y34       DSP_ALU (Prop_DSP_ALU_DSP48E2_U_DATA[10]_ALU_OUT[10])
+                                                  0.803     6.541 r  calc_reg/DSP_ALU_INST/ALU_OUT[10]
+                     net (fo=1, routed)           0.000     6.541    calc_reg/DSP_ALU.ALU_OUT&lt;10&gt;
+DSP48E2_X11Y34       DSP_OUTPUT                                   r  calc_reg/DSP_OUTPUT_INST/ALU_OUT[10]
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        4.000     4.000 r  
+AG12                                              0.000     4.000 r  clk (IN)
+                     net (fo=0)                   0.000     4.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.515     4.515 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.066     4.581    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.034     4.615 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.722     5.337    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.091     5.428 r  clk_IBUF_BUFG_inst/O
+X2Y1 (CLOCK_ROOT)    net (fo=80, routed)          1.964     7.392    calc_reg/CLK
+DSP48E2_X11Y34       DSP_OUTPUT                                   r  calc_reg/DSP_OUTPUT_INST/CLK
+                     clock pessimism              0.694     8.086    
+                     clock uncertainty           -0.035     8.050    
+DSP48E2_X11Y34       DSP_OUTPUT (Setup_DSP_OUTPUT_DSP48E2_CLK_ALU_OUT[10])
+                                                 -0.104     7.946    calc_reg/DSP_OUTPUT_INST
+</code></pre>
+<hr>
+<pre><code>                     required time                          7.946    
+                     arrival time                          -6.541    
+</code></pre>
+<hr>
+<pre><code>                     slack                                  1.406
+</code></pre>
+<p>第二个时序报告涉及第二个 Verilog 代码示例。在这个例子中，通过流水线技术改善了情况：</p>
+<p>Slack (MET) :             0.433ns  (required time - arrival time)<br>  Source:                 y_reg[1]__0&#x2F;C<br>                            (rising edge-triggered cell FDRE clocked by clk  {<a href="mailto:&#114;&#105;&#115;&#x65;&#x40;&#48;&#x2e;&#48;&#48;&#x30;&#x6e;&#x73;">rise@0.000ns</a> <a href="mailto:&#x66;&#97;&#x6c;&#x6c;&#x40;&#x32;&#46;&#x30;&#48;&#48;&#110;&#x73;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Destination:            calc_reg[23]&#x2F;D<br>                            (rising edge-triggered cell FDRE clocked by clk  {<a href="mailto:&#x72;&#105;&#115;&#x65;&#x40;&#x30;&#x2e;&#48;&#x30;&#x30;&#x6e;&#115;">rise@0.000ns</a> <a href="mailto:&#x66;&#97;&#108;&#x6c;&#64;&#50;&#x2e;&#48;&#48;&#x30;&#110;&#115;">fall@2.000ns</a> period&#x3D;4.000ns})<br>  Path Group:             clk<br>  Path Type:              Setup (Max at Slow Process Corner)<br>  Requirement:            4.000ns  (clk <a href="mailto:&#114;&#x69;&#x73;&#x65;&#64;&#52;&#46;&#48;&#x30;&#48;&#x6e;&#x73;">rise@4.000ns</a> - clk <a href="mailto:&#114;&#x69;&#x73;&#101;&#x40;&#x30;&#x2e;&#x30;&#x30;&#48;&#110;&#x73;">rise@0.000ns</a>)<br>  Data Path Delay:        3.465ns  (logic 1.653ns (47.706%)  route 1.812ns (52.294%))<br>  Logic Levels:           6  (CARRY8&#x3D;4 LUT4&#x3D;2)<br>  Clock Path Skew:        -0.129ns (DCD - SCD + CPR)<br>    Destination Clock Delay (DCD):    3.373ns &#x3D; ( 7.373 - 4.000 )<br>    Source Clock Delay      (SCD):    4.040ns<br>    Clock Pessimism Removal (CPR):    0.538ns<br>  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1&#x2F;2 + DJ) &#x2F; 2 + PE<br>    Total System Jitter     (TSJ):    0.071ns<br>    Total Input Jitter      (TIJ):    0.000ns<br>    Discrete Jitter          (DJ):    0.000ns<br>    Phase Error              (PE):    0.000ns<br>  Clock Net Delay (Source):      2.208ns (routing 0.756ns, distribution 1.452ns)<br>  Clock Net Delay (Destination): 1.945ns (routing 0.696ns, distribution 1.249ns)</p>
+<pre><code>Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        0.000     0.000 r  
+AG12                                              0.000     0.000 r  clk (IN)
+                     net (fo=0)                   0.000     0.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.738     0.738 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.105     0.843    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.049     0.892 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.839     1.731    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.101     1.832 r  clk_IBUF_BUFG_inst/O
+X2Y1 (CLOCK_ROOT)    net (fo=121, routed)         2.208     4.040    clk_IBUF_BUFG
+SLICE_X54Y88         FDRE                                         r  y_reg[1]__0/C
+</code></pre>
+<hr>
+<pre><code>SLICE_X54Y88         FDRE (Prop_EFF2_SLICEL_C_Q)
+                                                  0.138     4.178 r  y_reg[1]__0/Q
+                     net (fo=25, routed)          0.505     4.683    y[1]
+SLICE_X53Y91         LUT4 (Prop_B6LUT_SLICEM_I0_O)
+                                                  0.150     4.833 r  calc[7]_i_28/O
+                     net (fo=1, routed)           0.344     5.177    calc[7]_i_28_n_0
+SLICE_X53Y89         CARRY8 (Prop_CARRY8_SLICEM_DI[2]_CO[7])
+                                                  0.424     5.601 r  calc_reg[7]_i_9/CO[7]
+                     net (fo=1, routed)           0.043     5.644    calc_reg[7]_i_9_n_0
+SLICE_X53Y90         CARRY8 (Prop_CARRY8_SLICEM_CI_O[0])
+                                                  0.122     5.766 r  calc_reg[23]_i_30/O[0]
+                     net (fo=3, routed)           0.402     6.168    calc_reg[23]_i_30_n_15
+SLICE_X51Y88         LUT4 (Prop_C5LUT_SLICEL_I0_O)
+                                                  0.169     6.337 r  calc[15]_i_8/O
+                     net (fo=1, routed)           0.437     6.774    calc[15]_i_8_n_0
+SLICE_X51Y92         CARRY8 (Prop_CARRY8_SLICEL_DI[1]_CO[7])
+                                                  0.422     7.196 r  calc_reg[15]_i_1/CO[7]
+                     net (fo=1, routed)           0.030     7.226    calc_reg[15]_i_1_n_0
+SLICE_X51Y93         CARRY8 (Prop_CARRY8_SLICEL_CI_O[7])
+                                                  0.228     7.454 r  calc_reg[23]_i_1/O[7]
+                     net (fo=1, routed)           0.051     7.505    calc_reg[23]_i_1_n_8
+SLICE_X51Y93         FDRE                                         r  calc_reg[23]/D
+</code></pre>
+<hr>
+<pre><code>                     (clock clk rise edge)        4.000     4.000 r  
+AG12                                              0.000     4.000 r  clk (IN)
+                     net (fo=0)                   0.000     4.000    clk_IBUF_inst/I
+AG12                 INBUF (Prop_INBUF_HRIO_PAD_O)
+                                                  0.515     4.515 r  clk_IBUF_inst/INBUF_INST/O
+                     net (fo=1, routed)           0.066     4.581    clk_IBUF_inst/OUT
+AG12                 IBUFCTRL (Prop_IBUFCTRL_HRIO_I_O)
+                                                  0.034     4.615 r  clk_IBUF_inst/IBUFCTRL_INST/O
+                     net (fo=1, routed)           0.722     5.337    clk_IBUF
+BUFGCE_X1Y0          BUFGCE (Prop_BUFCE_BUFGCE_I_O)
+                                                  0.091     5.428 r  clk_IBUF_BUFG_inst/O
+X2Y1 (CLOCK_ROOT)    net (fo=121, routed)         1.945     7.373    clk_IBUF_BUFG
+SLICE_X51Y93         FDRE                                         r  calc_reg[23]/C
+                     clock pessimism              0.538     7.910    
+                     clock uncertainty           -0.035     7.875    
+SLICE_X51Y93         FDRE (Setup_HFF_SLICEL_C_D)
+                                                  0.063     7.938    calc_reg[23]
+</code></pre>
+<hr>
+<pre><code>                     required time                          7.938    
+                     arrival time                          -7.505    
+</code></pre>
+<hr>
+<pre><code>                     slack                                  0.433
+</code></pre>
+<p>这种差异没有用指定算术单元时那么明显。但这仍然足够满足时间限制。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">JERRY LEE</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/04/18/FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2/">http://example.com/2026/04/18/FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">JERRY'S BLOG</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/FPGA/">FPGA</a></div><div class="post_share"><div class="social-share" data-image="/img/my_logo.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/05/06/%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF/" title="模拟电路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">模拟电路</div></div></a></div><div class="next-post pull-right"><a href="/2026/03/22/%E6%95%B0%E5%AD%A6%E5%8F%98%E6%8D%A2/" title="数学变换"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">数学变换</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2025/10/13/FPGA-DDR/" title="FPGA-DDR"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-13</div><div class="title">FPGA-DDR</div></div></a></div><div><a href="/2025/09/07/FPGA-BRAM/" title="FPGA-BRAM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-07</div><div class="title">FPGA-BRAM</div></div></a></div><div><a href="/2025/09/02/FPGA-FIFO/" title="FPGA-FIFO"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-02</div><div class="title">FPGA-FIFO</div></div></a></div><div><a href="/2025/11/13/FPGA-HLS/" title="FPGA-HLS"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="title">FPGA-HLS</div></div></a></div><div><a href="/2025/12/14/FPGA-Debug/" title="FPGA-Debug"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-14</div><div class="title">FPGA-Debug</div></div></a></div><div><a href="/2025/10/13/FPGA-%E8%8A%AF%E7%89%87%E5%88%86%E6%9E%90/" title="FPGA-芯片分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-13</div><div class="title">FPGA-芯片分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/my_logo.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">JERRY LEE</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">42</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/98Jerrylee" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/98jerry.lee@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2"><span class="toc-text">FPGA-一个大神的博客</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/05/%E8%B6%85%E5%A3%B0%E4%B8%8A%E4%BD%8D%E6%9C%BA/" title="超声上位机">超声上位机</a><time datetime="2026-06-05T03:22:12.181Z" title="发表于 2026-06-05 11:22:12">2026-06-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/18/%E7%AB%A0%E6%9B%A6%E7%A0%94%E7%A9%B6%E5%AD%A6%E4%BC%9A/" title="章曦研究学会">章曦研究学会</a><time datetime="2026-05-18T08:27:09.702Z" title="发表于 2026-05-18 16:27:09">2026-05-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/06/%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF/" title="模拟电路">模拟电路</a><time datetime="2026-05-06T14:09:49.360Z" title="发表于 2026-05-06 22:09:49">2026-05-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/18/FPGA-%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%A5%9E%E7%9A%84%E5%8D%9A%E5%AE%A2/" title="FPGA-一个大神的博客">FPGA-一个大神的博客</a><time datetime="2026-04-18T04:08:21.009Z" title="发表于 2026-04-18 12:08:21">2026-04-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/22/%E6%95%B0%E5%AD%A6%E5%8F%98%E6%8D%A2/" title="数学变换">数学变换</a><time datetime="2026-03-22T10:07:22.413Z" title="发表于 2026-03-22 18:07:22">2026-03-22</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/default_top_img.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2026 By JERRY LEE</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b2"></script><script src="/js/main.js?v=4.14.0-b2"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/copy-tex.min.js"></script><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.innerHTML = `<pre class="mermaid-src" hidden>${ele.textContent}</pre>`
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
